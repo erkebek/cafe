@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ky">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Рыбный двор</title>
+    <!-- Tailwind CSS minified build served via unpkg CDN. Linking directly to the
+         compiled stylesheet avoids file:// security restrictions in the browser. -->
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" />
+
+    <!-- Custom brand colours based on the restaurant logo. We define CSS variables
+         and helper classes to apply these colours throughout the site. -->
+    <style>
+      :root {
+        /* Dark green background reminiscent of the logo */
+        --bg: #002d1b;
+        /* Slightly lighter green for cards and panels */
+        --card: #013d2d;
+        /* Accent green used for highlights, buttons and important text */
+        --accent: #7bb37d;
+        /* Primary text colour (off‑white) */
+        --text: #f0f7f0;
+        /* Secondary text colour (muted greenish grey) */
+        --secondary-text: #a0c4a8;
+        /* Border colour matching the card */
+        --border: #01412e;
+      }
+      .bg-main { background-color: var(--bg); }
+      .bg-card { background-color: var(--card); }
+      .text-accent { color: var(--accent); }
+      .bg-accent { background-color: var(--accent); color: var(--bg); }
+      .text-secondary { color: var(--secondary-text); }
+      .text-primary { color: var(--text); }
+      .border-brand { border-color: var(--border); }
+      .text-main { color: var(--bg); }
+    </style>
+  </head>
+  <!--
+    This single‑page application uses React (via the UMD build) and
+    TailwindCSS (via CDN) to render a modern, mobile‑first menu for the
+    "Рыбный двор" café. All logic and data live inside the inline
+    script below. To adjust translations, categories or dishes simply
+    edit the JavaScript object definitions.
+  -->
+  <body class="bg-main text-primary">
+    <div id="root"></div>
+    <!-- Include React, ReactDOM and Babel via UMD builds from UNPKG. These are
+         delivered over a CDN and will always provide the latest stable versions.
+         We rely on Babel in the browser to transform our JSX into plain JS. -->
+    <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Application code -->
+    <script type="text/babel" data-presets="react" data-plugins="proposal-class-properties,proposal-object-rest-spread">
+      const { useState } = React;
+
+      // Translation dictionary for static text
+      const translations = {
+        brand_name: {
+          ky: 'Рыбный двор',
+          ru: 'Рыбный двор',
+          en: 'Fish Court',
+        },
+        popular_title: {
+          ky: 'Популярдуу тамактар',
+          ru: 'Популярные блюда',
+          en: 'Popular Dishes',
+        },
+        categories_title: {
+          ky: 'Категориялар',
+          ru: 'Категории',
+          en: 'Categories',
+        },
+        payment_title: {
+          ky: 'Төлөө ыкмалары',
+          ru: 'Способы оплаты',
+          en: 'Payment Options',
+        },
+        payment_description: {
+          ky: 'Төмөндөгү QR коддор аркылуу төлөй аласыз:',
+          ru: 'Вы можете оплатить с помощью QR‑кодов ниже:',
+          en: 'You can pay using the QR codes below:',
+        },
+        search_placeholder: {
+          ky: 'Издөө...',
+          ru: 'Поиск...',
+          en: 'Search...',
+        },
+      };
+
+      // Category definitions
+      const categories = [
+        {
+          key: 'main',
+          names: {
+            ky: 'Негизги тамактар',
+            ru: 'Основные блюда',
+            en: 'Main Dishes',
+          },
+        },
+        {
+          key: 'soups',
+          names: {
+            ky: 'Шорпалар',
+            ru: 'Супы',
+            en: 'Soups',
+          },
+        },
+        {
+          key: 'salads',
+          names: {
+            ky: 'Салаттар',
+            ru: 'Салаты',
+            en: 'Salads',
+          },
+        },
+        {
+          key: 'drinks',
+          names: {
+            ky: 'Суусундуктар',
+            ru: 'Напитки',
+            en: 'Drinks',
+          },
+        },
+      ];
+
+      // Dish data
+      const dishes = [
+        {
+          id: 'grilled_trout',
+          names: {
+            ky: 'Куурылган форель',
+            ru: 'Жареная форель',
+            en: 'Grilled Trout',
+          },
+          descriptions: {
+            ky: 'Жыпар жыттуу чөптөр менен даярдалган даамдуу форель.',
+            ru: 'Вкусная форель, приготовленная с ароматными травами.',
+            en: 'Delicious trout prepared with fragrant herbs.',
+          },
+          price: '500 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'main',
+          popular: true,
+        },
+        {
+          id: 'trout_soup',
+          names: {
+            ky: 'Форель шорпосу',
+            ru: 'Уха из форели',
+            en: 'Trout Soup',
+          },
+          descriptions: {
+            ky: 'Жаңы форель кошулган жеңил жана даамдуу шорпо.',
+            ru: 'Лёгкий и вкусный суп с добавлением свежей форели.',
+            en: 'A light and flavorful soup with fresh trout.',
+          },
+          price: '350 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'soups',
+          popular: true,
+        },
+        {
+          id: 'smoked_trout_salad',
+          names: {
+            ky: 'Ысталган форель салаты',
+            ru: 'Салат с копчёной форелью',
+            en: 'Smoked Trout Salad',
+          },
+          descriptions: {
+            ky: 'Жеңил салат дымко ысталган форель жана жаңы жашылчалар менен.',
+            ru: 'Лёгкий салат из копчёной форели и свежих овощей.',
+            en: 'A light salad with smoked trout and fresh vegetables.',
+          },
+          price: '420 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'salads',
+          popular: false,
+        },
+        {
+          id: 'trout_with_veggies',
+          names: {
+            ky: 'Форель жашылчалар менен',
+            ru: 'Форель с овощами',
+            en: 'Trout with Vegetables',
+          },
+          descriptions: {
+            ky: 'Көмөч казанга бышырылган форель жана сезондук жашылчалар.',
+            ru: 'Форель, запечённая вместе с сезонными овощами.',
+            en: 'Baked trout served with seasonal vegetables.',
+          },
+          price: '550 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'main',
+          popular: false,
+        },
+        {
+          id: 'herbal_tea',
+          names: {
+            ky: 'Дары чөп чайы',
+            ru: 'Травяной чай',
+            en: 'Herbal Tea',
+          },
+          descriptions: {
+            ky: 'Табигый чөптөрдөн жасалган дем.',
+            ru: 'Настой из натуральных трав.',
+            en: 'Infusion made from natural herbs.',
+          },
+          price: '80 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'drinks',
+          popular: false,
+        },
+        {
+          id: 'mineral_water',
+          names: {
+            ky: 'Минералдык суу',
+            ru: 'Минеральная вода',
+            en: 'Mineral Water',
+          },
+          descriptions: {
+            ky: 'Курамында минералдар көп болгон таза суу.',
+            ru: 'Чистая вода с высоким содержанием минералов.',
+            en: 'Pure water with a high mineral content.',
+          },
+          price: '50 KGS',
+          image: 'assets/images/dish-placeholder.jpg',
+          video: '',
+          category: 'drinks',
+          popular: false,
+        },
+      ];
+
+      function LanguageSelector({ currentLang, setLang }) {
+        const langs = [
+          { key: 'ky', label: 'Кыргызча' },
+          { key: 'ru', label: 'Русский' },
+          { key: 'en', label: 'English' },
+        ];
+        return (
+          <div className="flex gap-2">
+            <select className="px-3 py-1 rounded-full text-sm transition-colors bg-card border border-brand text-primary hover:bg-card" onChange={(e) => setLang(e.target.value)}>
+              {langs.map((lang) => (
+                <option
+                  key={lang.key}
+                >
+                  {lang.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+      }
+
+      function DishCard({ dish, lang, onSelect }) {
+        return (
+          <div
+            className="bg-card rounded-xl overflow-hidden border border-brand cursor-pointer transform transition duration-150 hover:scale-105"
+            onClick={() => onSelect(dish)}
+          >
+            <img
+              src={dish.image}
+              alt={dish.names[lang]}
+              className="w-full h-32 object-cover"
+            />
+            <div className="p-3 flex flex-col gap-1">
+              <div className="font-semibold text-sm text-primary">
+                {dish.names[lang]}
+              </div>
+              <div className="text-xs text-secondary h-10 overflow-hidden">
+                {dish.descriptions[lang]}
+              </div>
+              <div className="text-sm font-semibold mt-auto">
+                {dish.price}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function DishModal({ dish, lang, onClose }) {
+        if (!dish) return null;
+        return (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+            <div className="bg-card rounded-lg max-w-md w-full overflow-hidden border border-brand relative">
+              <button
+                onClick={onClose}
+                className="absolute top-2 right-2 text-secondary hover:text-primary text-xl"
+              >
+                &times;
+              </button>
+              {dish.video ? (
+                <video controls className="w-full h-48 object-cover">
+                  <source src={dish.video} type="video/mp4" />
+                  Your browser does not support video.
+                </video>
+              ) : (
+                <img
+                  src={dish.image}
+                  alt={dish.names[lang]}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="p-4">
+                <h3 className="text-lg font-bold mb-2">
+                  {dish.names[lang]}
+                </h3>
+                <p className="text-sm text-secondary mb-4">
+                  {dish.descriptions[lang]}
+                </p>
+                <p className="font-semibold text-base">
+                  {dish.price}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function App() {
+        const [lang, setLang] = useState('ky');
+        const [category, setCategory] = useState(categories[0].key);
+        const [selectedDish, setSelectedDish] = useState(null);
+
+        const popularDishes = dishes.filter((d) => d.popular);
+        const categoryDishes = dishes.filter((d) => d.category === category);
+
+        const t = (key) => translations[key][lang];
+
+        return (
+          <div className="min-h-screen flex flex-col">
+            {/* Header */}
+            <header className="flex justify-between items-center p-4 bg-card border-b border-brand">
+              <div className="flex items-center gap-2">
+                <img src="assets/images/logo_fish.png" alt="Fish logo" className="h-8 w-auto" />
+                <img src="assets/images/logo_text.png" alt="Fish logo" className="h-6 w-auto" />
+              </div>
+              <LanguageSelector currentLang={lang} setLang={setLang} />
+            </header>
+
+            <main className="flex-1 overflow-y-auto p-4">
+              {/* Popular Section */}
+              <section className="mb-6">
+                <h2 className="text-lg font-semibold mb-3">
+                  {t('popular_title')}
+                </h2>
+                <div className="flex space-x-4 overflow-x-auto pb-2">
+                  {popularDishes.map((dish) => (
+                    <div key={dish.id} className="min-w-[160px]">
+                      <DishCard dish={dish} lang={lang} onSelect={setSelectedDish} />
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Categories Section */}
+              <section className="mb-6">
+                <h2 className="text-lg font-semibold mb-3">
+                  {t('categories_title')}
+                </h2>
+                <div className="flex space-x-2 mb-4 overflow-x-auto">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.key}
+                      onClick={() => setCategory(cat.key)}
+                      className={`px-4 py-1 rounded-full text-sm whitespace-nowrap transition-colors ${category === cat.key ? 'bg-white text-main' : 'bg-card border border-brand text-primary hover:bg-card'}`}
+                    >
+                      {cat.names[lang]}
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {categoryDishes.map((dish) => (
+                    <DishCard
+                      key={dish.id}
+                      dish={dish}
+                      lang={lang}
+                      onSelect={setSelectedDish}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* Payment Section */}
+              <section className="bg-card p-4 rounded-lg border border-brand">
+                <h2 className="text-lg font-semibold mb-2">
+                  {t('payment_title')}
+                </h2>
+                <p className="text-sm text-secondary mb-4">
+                  {t('payment_description')}
+                </p>
+                <div className="flex space-x-4">
+                  <img
+                    src="assets/images/qr-placeholder.png"
+                    alt="QR Code"
+                    className="w-24 h-24 object-cover rounded-md border border-brand"
+                  />
+                  <img
+                    src="assets/images/qr-placeholder.png"
+                    alt="QR Code"
+                    className="w-24 h-24 object-cover rounded-md border border-brand"
+                  />
+                </div>
+              </section>
+            </main>
+
+            {/* Dish Modal */}
+            {selectedDish && (
+              <DishModal
+                dish={selectedDish}
+                lang={lang}
+                onClose={() => setSelectedDish(null)}
+              />
+            )}
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+
+  </body>
+</html>
