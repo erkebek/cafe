@@ -101,7 +101,7 @@
         {
           key: 'soups',
           names: {
-            ky: 'Шорпалар',
+            ky: 'Шорполор',
             ru: 'Супы',
             en: 'Soups',
           },
@@ -129,8 +129,8 @@
         {
           id: 'grilled_trout',
           names: {
-            ky: 'Куурылган форель',
-            ru: 'Жареная форель',
+            ky: 'Мангалга бышкан форель',
+            ru: 'Форель на мангале',
             en: 'Grilled Trout',
           },
           descriptions: {
@@ -248,6 +248,8 @@
               {langs.map((lang) => (
                 <option
                   key={lang.key}
+                  value={lang.key}
+                  selected={lang.key === currentLang}
                 >
                   {lang.label}
                 </option>
